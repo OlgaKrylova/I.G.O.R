@@ -1,0 +1,4 @@
+,Time,face_cb_pred,EyeClassifier,pose_cb_pred,static_pose,sleep_predict,cheater,emotion,emo_sth
+0,0,0,0,0,0,0,0,0,0
+0,08-26 09:46:50,0,0,0,True,0,0,disgust,disgust
+0,08-26 09:46:54,0,0,0,True,0,0,disgust,disgust
