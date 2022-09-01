@@ -4,7 +4,7 @@ Imperfect but Glorious Oppressive Robot
 
 Система удаленного констроля и анализа поведения сотрудника на рабочем месте. Включает детекцию сна, детекцию эмоций, инструменты обратной связи, сбора статистики и визуализации.
 
-Это проект [Виталия Андреева](https://github.com/ShakalTabaqui), [Владислава Багудинова](https://github.com/VAapero1), [Ольги Крыловой](https://github.com/OlgaKrylova), [Михаила Подтягина](https://github.com/datascientist73) в [Elbrus cooding bootcamp](https://github.com/Elbrus-DataScience).
+Это проект [@ShakalTabaqui](https://github.com/ShakalTabaqui), [@VAapero1](https://github.com/VAapero1), [@OlgaKrylova](https://github.com/OlgaKrylova), [@datascientist73](https://github.com/datascientist73) в [Elbrus cooding bootcamp](https://github.com/Elbrus-DataScience).
 
 ![emo_pic](images/emotions.png)
 ![mesh_pic](images/mesh.png)
