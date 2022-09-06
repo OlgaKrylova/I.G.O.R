@@ -8,3 +8,4 @@ Imperfect but Glorious Oppressive Robot
 
 ![emo_pic](images/emotions.png)
 ![mesh_pic](images/mesh.png)
+Часть идей по отбору точек для классификации [взята отсюда](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8828335)
