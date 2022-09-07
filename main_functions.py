@@ -1,3 +1,7 @@
+import math as m
+import cv2
+import mediapipe as mp
+
 def euc_distance(x,y):
   a = ((x[0]-y[0])**2+(x[1]-y[1])**2)**0.5
   return a
@@ -21,20 +25,22 @@ def StaticPose (face_dump, points, num):
       return ''
 
 ### EMO CLASSIFIER FEATURES CREATION 
-def create_features_dict(image, points, points_dict, P, s = 0):
+def create_features_dict(image, points, P, face_mesh, s):
   df = {}
+  points_dict = {i : 0 for i in range(469)}
   results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
   if results.multi_face_landmarks:
-          for id, point in enumerate(face_landmarks.landmark):
-              if id in points:
-                  width, height, color = image.shape
-                  width, height = int(point.x * width), int(point.y * height)
-                  points_dict[id] = [width, height]
+    for face_landmarks in results.multi_face_landmarks:
+      for id, point in enumerate(face_landmarks.landmark):
+          if id in points:
+              width, height, color = image.shape
+              width, height = int(point.x * width), int(point.y * height)
+              points_dict[id] = [width, height]
 
       ### ANGLES
       df['teta1'] = 57.296 *  m.acos(((points_dict[P[2]][0] - points_dict[P[0]][0])*(points_dict[P[3]][0] - points_dict[P[0]][0]) +\
-            (points_dict[P[2]][1] - points_dict[P[0]][1])*(points_dict[P[3]][1] - points_dict[P[0]][1]))/\
-          ((euc_distance(points_dict[P[0]],points_dict[P[2]]) * euc_distance(points_dict[P[0]],points_dict[P[3]]))+0.0001))
+      (points_dict[P[2]][1] - points_dict[P[0]][1])*(points_dict[P[3]][1] - points_dict[P[0]][1]))/\
+      ((euc_distance(points_dict[P[0]],points_dict[P[2]]) * euc_distance(points_dict[P[0]],points_dict[P[3]]))+0.0001))
       teta2 = 57.296 * m.acos(((points_dict[P[0]][0] - points_dict[P[2]][0])*(points_dict[P[1]][0] - points_dict[P[2]][0])+\
             (points_dict[P[0]][1] - points_dict[P[2]][1])*(points_dict[P[1]][1] - points_dict[P[2]][1]))/\
           ((euc_distance(points_dict[P[0]],points_dict[P[2]]) * euc_distance(points_dict[P[2]],points_dict[P[1]]))+0.0001))
@@ -85,10 +91,8 @@ def create_features_dict(image, points, points_dict, P, s = 0):
       df['r_eye_nose_in'] = euc_distance(points_dict[133],points_dict[100])/euc_distance(points_dict[10],points_dict[152])
       df['l_eye_nose_in'] = euc_distance(points_dict[463],points_dict[329])/euc_distance(points_dict[10],points_dict[152])
   else:
-      df['teta1', 'teta2', 'teta3', 'teta4', 'teta5', 'teta6', 'teta7', 'teta8', 'teta9', 'teta10', 'l_eye_w',\
+      df = dict.fromkeys(['teta1', 'teta2', 'teta3', 'teta4', 'teta5', 'teta6', 'teta7', 'teta8', 'teta9', 'teta10', 'l_eye_w',\
               'l_eye_h', 'r_eye_w', 'r_eye_h', 'lips_w', 'lips_h', 'lips_h_in', 'brows_dist', 'r_cheek_eye', 'l_cheek_eye',\
               'r_cheek_lip', 'l_cheek_lip', 'r_eye_brow_in', 'l_eye_brow_in', 'r_eye_brow_out', 'l_eye_brow_out', 'r_eye_nose_in',\
-                'l_eye_nose_in'] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  
-faces_data_frame = pd.DataFrame(df,index=[s])
-return faces_data_frame
+                'l_eye_nose_in'],0)
+  return df
