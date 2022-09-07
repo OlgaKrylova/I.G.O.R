@@ -20,6 +20,7 @@ def StaticPose (face_dump, points, num):
     except:
       return ''
 
+### EMO CLASSIFIER FEATURES CREATION 
 def create_features_dict(image, points, points_dict, P, s = 0):
   df = {}
   results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
