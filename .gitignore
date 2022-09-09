@@ -2,3 +2,4 @@
 /mediapipe
 **face scheme.paint
 .DS_Store
+/__pycache__
