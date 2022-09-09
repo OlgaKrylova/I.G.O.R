@@ -15,7 +15,7 @@ Imperfect but Glorious Oppressive Robot
 <img src="images/face_scheme.jpg" alt="bash" width="300" height="400"/>
 </p>
 
-Часть идей по отбору точек для классификации [взята отсюда](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8828335)
+Часть идей по отбору точек для классификации [взята отсюда](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8828335)</p>
 Немного картинок, которые мы получали в процессе обучения моделей:
 ![emo_pic](images/emotions.png)
 ![mesh_pic](images/mesh.png)
