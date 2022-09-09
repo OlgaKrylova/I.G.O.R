@@ -11,8 +11,8 @@ Imperfect but Glorious Oppressive Robot
 Слева - точки которые мы получаем после детекции Mediapipe, на двух других картинках - расстояния и углы, которые мы использовали для классификации эмоций:
 <p align="center">
 <img src="images/face_annotated.jpg" alt="bash" width="350" height="400"/>
-<img src="images/faces_scheme_vit.jpeg" alt="bash" width="300" height="400"/>
-<img src="images/face_scheme.jpg" alt="bash" width="300" height="400"/>
+<img src="images/faces_scheme_vit.jpeg" alt="bash" width="320" height="400"/>
+<img src="images/face_scheme.jpg" alt="bash" width="320" height="400"/>
 </p>
 
 Часть идей по отбору точек для классификации [взята отсюда](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8828335)</p>
