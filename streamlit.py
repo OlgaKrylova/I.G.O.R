@@ -30,7 +30,7 @@ sound1 = pg.mixer.Sound('songs/IGOR.wav')
 sound2 = pg.mixer.Sound('songs/IGOR2.wav')
 sound3 = pg.mixer.Sound('songs/Song2.wav')
 
-# загружаем модели детекции сна по позе и лицу
+# загружаем модели детекции сна и эмоций по позе и лицу
 face_cb_model = pickle.load(open('ML_models/cl_face_cb.sav', 'rb'))
 pose_cb_model = pickle.load(open('ML_models/cl_pose_cb.sav', 'rb'))
 emo_cb_model = pickle.load(open('ML_models/cl_emo_cb.sav', 'rb'))
