@@ -96,3 +96,38 @@ def create_features_dict(image, points, P, face_mesh, s):
               'r_cheek_lip', 'l_cheek_lip', 'r_eye_brow_in', 'l_eye_brow_in', 'r_eye_brow_out', 'l_eye_brow_out', 'r_eye_nose_in',\
                 'l_eye_nose_in'],0)
   return df
+
+def create_sleep_features_dict(points_dict):
+  df['l_eye_w'] = euc_distance(points_dict[362],points_dict[359])
+  df['l_eye_h'] = euc_distance(points_dict[386],points_dict[374])
+  df['r_eye_w'] = euc_distance(points_dict[130],points_dict[133])
+  df['r_eye_h'] = euc_distance(points_dict[159],points_dict[145])
+  df['eyes_h_dist'] = abs(points_dict[159][1] - points_dict[386][1])
+  df['eyes_w_dist'] = abs(points_dict[159][0] - points_dict[386][0])
+  df['lips_h_dist'] = abs(points_dict[61][1] - points_dict[292][1])
+  df['lips_w_dist'] = abs(points_dict[61][0] - points_dict[292][0])
+  df['cheeks_h_dist'] = abs(points_dict[50][1] - points_dict[280][1])
+  df['cheeks_w_dist'] = abs(points_dict[50][0] - points_dict[280][0])
+  df['face_h_dist'] = abs(points_dict[10][1] - points_dict[175][1])
+  df['face_w_dist'] = abs(points_dict[10][0] - points_dict[175][0])
+  return df
+
+def create_pose_features_dict(image, result, df):  
+  width, height, color = image.shape
+  df['r_shoulder_lip'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
+  df['r_shoulder_cheek'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
+  df['r_shoulder_eye'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
+  df['r_shoulder_eye_h'] = -results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].y * height + results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height
+  df['r_shoulder_eye_w'] = - results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].x * width + results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width
+  df['l_shoulder_lip'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_LEFT].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_LEFT].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
+  df['l_shoulder_cheek'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EAR].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EAR].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
+  df['l_shoulder_eye'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].y * height],\
+      [results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
+  df['l_shoulder_eye_h'] = - results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].y * height + results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height
+  df['l_shoulder_eye_w'] = - results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].x * width + results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width  
+  return df

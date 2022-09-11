@@ -19,7 +19,7 @@ from datetime import datetime, date, time
 from pygame import mixer
 import pygame as pg
 # other functions
-from main_functions import euc_distance, EyeClassifier, StaticPose
+from main_functions import euc_distance, EyeClassifier, StaticPose, create_sleep_features_dict, create_features_dict, create_pose_features_dict
 
 # загружаем звук будильника
 mixer.init()
@@ -55,7 +55,7 @@ cap = cv2.VideoCapture(0)
 FRAME_WINDOW = st.image([])
 # создаем счётчик, списки и словари и пустые датасеты
 points = [i for i in range (469)]
-points_dict = {i : 0 for i in range(469)}
+# points_dict = {i : 0 for i in range(469)}
 
 face_data = {
 'r_shoulder_lip': 0,'r_shoulder_cheek': 0,'r_shoulder_eye': 0,'r_shoulder_eye_h': 0,'r_shoulder_eye_w': 0,
@@ -97,7 +97,6 @@ if add_radio == "Stream":
         results1 = face_mesh.process(image)
         fps_counter += 1
         df ={}
-        df_emo = {}
         if results1.multi_face_landmarks:
           for face_landmarks in results1.multi_face_landmarks:
             for id, point in enumerate(face_landmarks.landmark):
@@ -106,86 +105,19 @@ if add_radio == "Stream":
                     width, height = int(point.x * height), int(point.y * width)
                     points_dict[id] = [width, height]
             # находим расстояни между точками на лице
-            df['l_eye_w'] = euc_distance(points_dict[362],points_dict[359])
-            df['l_eye_h'] = euc_distance(points_dict[386],points_dict[374])
-            df['r_eye_w'] = euc_distance(points_dict[130],points_dict[133])
-            df['r_eye_h'] = euc_distance(points_dict[159],points_dict[145])
-            df['eyes_h_dist'] = abs(points_dict[159][1] - points_dict[386][1])
-            df['eyes_w_dist'] = abs(points_dict[159][0] - points_dict[386][0])
-            df['lips_h_dist'] = abs(points_dict[61][1] - points_dict[292][1])
-            df['lips_w_dist'] = abs(points_dict[61][0] - points_dict[292][0])
-            df['cheeks_h_dist'] = abs(points_dict[50][1] - points_dict[280][1])
-            df['cheeks_w_dist'] = abs(points_dict[50][0] - points_dict[280][0])
-            df['face_h_dist'] = abs(points_dict[10][1] - points_dict[175][1])
-            df['face_w_dist'] = abs(points_dict[10][0] - points_dict[175][0])
-
-            data_frame = pd.DataFrame(df,index=[0])
+            data_frame = pd.DataFrame(create_sleep_features_dict(points_dict),index=[0])
             face_cb_pred = face_cb_model.predict(data_frame)
             face_pred.append(face_cb_pred)
             eyes_pred.append(EyeClassifier(points_dict))
             text4 = 'eyes_pred' + str(EyeClassifier(points_dict)) 
             text = 'face_cb_pred' + str(face_cb_pred) 
+        df_emo = create_features_dict(image, points, P, face_mesh, s=0)
+        emo_data_frame = pd.DataFrame(df_emo,index=[0])
+        emo_dump = pd.concat([emo_dump, emo_data_frame])
 
-            df_emo['teta1'] = 57.296 *  m.acos(((points_dict[P[2]][0] - points_dict[P[0]][0])*(points_dict[P[3]][0] - points_dict[P[0]][0]) +\
-            (points_dict[P[2]][1] - points_dict[P[0]][1])*(points_dict[P[3]][1] - points_dict[P[0]][1]))/\
-            ((euc_distance(points_dict[P[0]],points_dict[P[2]]) * euc_distance(points_dict[P[0]],points_dict[P[3]]))+0.0001))
-            teta2 = 57.296 * m.acos(((points_dict[P[0]][0] - points_dict[P[2]][0])*(points_dict[P[1]][0] - points_dict[P[2]][0])+\
-            (points_dict[P[0]][1] - points_dict[P[2]][1])*(points_dict[P[1]][1] - points_dict[P[2]][1]))/\
-            ((euc_distance(points_dict[P[0]],points_dict[P[2]]) * euc_distance(points_dict[P[2]],points_dict[P[1]]))+0.0001))
-            sign = ((points_dict[P[1]][1] - points_dict[P[2]][1]<0) and (points_dict[P[0]][1] - points_dict[P[2]][1])<0) * (-1)
-            ### ANGLES
-            df_emo['teta2'] = m.copysign(teta2, sign)
-            df_emo['teta3'] =  57.296 * m.acos(((points_dict[P[6]][0] - points_dict[P[7]][0])*(points_dict[P[8]][0] - points_dict[P[7]][0]) +\
-                    (points_dict[P[6]][1] - points_dict[P[7]][1])*(points_dict[P[8]][1] - points_dict[P[7]][1]))/ \
-                    ((euc_distance(points_dict[P[6]],points_dict[P[7]]) * euc_distance(points_dict[P[8]],points_dict[P[7]]))+0.0001) )
-            df_emo['teta4'] =  57.296 * m.acos(((points_dict[P[9]][0] - points_dict[P[7]][0])*(points_dict[P[10]][0] - points_dict[P[7]][0]) +\
-                    (points_dict[P[9]][1] - points_dict[P[7]][1])*(points_dict[P[10]][1] - points_dict[P[7]][1]))/\
-                    ((euc_distance(points_dict[P[9]],points_dict[P[7]]) * euc_distance(points_dict[P[10]],points_dict[P[7]]))+0.0001))
-            df_emo['teta5'] =  57.296 * m.acos(((points_dict[P[0]][0] - points_dict[P[7]][0])*(points_dict[P[1]][0] - points_dict[P[7]][0]) +\
-                    (points_dict[P[0]][1] - points_dict[P[7]][1])*(points_dict[P[1]][1] - points_dict[P[7]][1]))/\
-                    ((euc_distance(points_dict[P[0]],points_dict[P[7]]) * euc_distance(points_dict[P[1]],points_dict[P[7]]))+0.0001))
-            df_emo['teta6'] =  57.296 * m.acos(((points_dict[P[1]][0] - points_dict[P[5]][0])*(points_dict[P[8]][0] - points_dict[P[5]][0]) +\
-                    (points_dict[P[1]][1] - points_dict[P[5]][1])*(points_dict[P[8]][1] - points_dict[P[5]][1]))/\
-                    ((euc_distance(points_dict[P[1]],points_dict[P[5]]) * euc_distance(points_dict[P[8]],points_dict[P[5]]))+0.0001))
-            df_emo['teta7'] =  57.296 * m.acos(((points_dict[P[1]][0] - points_dict[P[10]][0])*(points_dict[P[8]][0] - points_dict[P[10]][0]) +\
-                    (points_dict[P[1]][1] - points_dict[P[10]][1])*(points_dict[P[8]][1] - points_dict[P[10]][1]))/\
-                    ((euc_distance(points_dict[P[1]],points_dict[P[10]]) * euc_distance(points_dict[P[8]],points_dict[P[10]]))+0.0001))
-            df_emo['teta8'] =  57.296 * m.acos(((points_dict[P[13]][0] - points_dict[P[12]][0])*(points_dict[P[14]][0] - points_dict[P[12]][0]) +\
-                    (points_dict[P[13]][1] - points_dict[P[12]][1])*(points_dict[P[14]][1] - points_dict[P[12]][1]))/\
-                    ((euc_distance(points_dict[P[13]],points_dict[P[12]]) * euc_distance(points_dict[P[14]],points_dict[P[12]]))+0.0001) )
-            df_emo['teta9'] =  57.296 * m.acos(((points_dict[P[21]][0] - points_dict[P[22]][0])*(points_dict[P[23]][0] - points_dict[P[22]][0]) +\
-                    (points_dict[P[21]][1] - points_dict[P[22]][1])*(points_dict[P[23]][1] - points_dict[P[22]][1]))/\
-                    ((euc_distance(points_dict[P[21]],points_dict[P[22]]) * euc_distance(points_dict[P[23]],points_dict[P[22]]))+0.0001))
-            df_emo['teta10'] =  57.296 * m.acos(((points_dict[P[6]][0] - points_dict[P[19]][0])*(points_dict[P[23]][0] - points_dict[P[19]][0]) +\
-                    (points_dict[P[6]][1] - points_dict[P[19]][1])*(points_dict[P[23]][1] - points_dict[P[19]][1]))/\
-                    ((euc_distance(points_dict[P[6]],points_dict[P[19]]) * euc_distance(points_dict[P[23]],points_dict[P[19]]))+0.0001))
-            ### DISTANCES
-            df_emo['l_eye_w'] = euc_distance(points_dict[362],points_dict[359])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_eye_h'] = euc_distance(points_dict[386],points_dict[374])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_eye_w'] = euc_distance(points_dict[130],points_dict[133])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_eye_h'] = euc_distance(points_dict[159],points_dict[145])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['lips_w'] = euc_distance(points_dict[61],points_dict[292])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['lips_h'] = euc_distance(points_dict[0],points_dict[17])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['lips_h_in'] = euc_distance(points_dict[13],points_dict[14])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['brows_dist'] = euc_distance(points_dict[55],points_dict[285])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_cheek_eye'] = euc_distance(points_dict[280],points_dict[446])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_cheek_eye'] = euc_distance(points_dict[50],points_dict[226])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_cheek_lip'] = euc_distance(points_dict[280],points_dict[287])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_cheek_lip'] = euc_distance(points_dict[50],points_dict[57])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_eye_brow_in'] = euc_distance(points_dict[285],points_dict[464])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_eye_brow_in'] = euc_distance(points_dict[55],points_dict[243])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_eye_brow_out'] = euc_distance(points_dict[300],points_dict[446])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_eye_brow_out'] = euc_distance(points_dict[70],points_dict[226])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['r_eye_nose_in'] = euc_distance(points_dict[133],points_dict[100])/euc_distance(points_dict[10],points_dict[152])
-            df_emo['l_eye_nose_in'] = euc_distance(points_dict[463],points_dict[329])/euc_distance(points_dict[10],points_dict[152]) 
-
-            emo_data_frame = pd.DataFrame(df_emo,index=[0])
-            emo_dump = pd.concat([emo_dump, emo_data_frame])
-
-            emo_pred = emo_cb_model.predict(emo_data_frame)
-            emo_pred = emo_pred[0]
+        emo_pred = emo_cb_model.predict(emo_data_frame)
+        emo_pred = emo_pred[0]
         
-
         else:
             face_cb_pred = 2
             face_pred.append(face_cb_pred)
@@ -198,24 +130,7 @@ if add_radio == "Stream":
         results3 = pose.process(image)
         df = {}
         if results3.pose_landmarks:
-            width, height, color = image.shape
-            df['r_shoulder_lip'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
-            df['r_shoulder_cheek'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
-            df['r_shoulder_eye'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
-            df['r_shoulder_eye_h'] = -results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].y * height + results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height
-            df['r_shoulder_eye_w'] = - results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE].x * width + results3.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width
-            df['l_shoulder_lip'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_LEFT].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_LEFT].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
-            df['l_shoulder_cheek'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EAR].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EAR].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
-            df['l_shoulder_eye'] = euc_distance([results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].y * height],\
-                [results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width, results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height])
-            df['l_shoulder_eye_h'] = - results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].y * height + results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height
-            df['l_shoulder_eye_w'] = - results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].x * width + results3.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width
-            
+            df = create_pose_features_dict(image, result3, df)
             data_frame = pd.DataFrame(df,index=[0])
             face_dump = pd.concat([face_dump, data_frame])
             pose_cb_pred = pose_cb_model.predict(data_frame)
@@ -277,14 +192,12 @@ if add_radio == "Stream":
             statistic_frame = pd.DataFrame(statistic_dict,index=[0])
             stat_frame_empt = pd.concat([stat_frame_empt, statistic_frame])
             stat_frame_empt.to_csv('Frames_archive/stat_frame.csv')
-            
-            
+                       
     else:
         st.write('')  
     cv2.destroyAllWindows()
     cap.release()
 
-    
 
 elif add_radio == "Statistics":
     choice = st.checkbox('Hour plot 📈')
