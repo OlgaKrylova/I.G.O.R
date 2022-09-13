@@ -98,6 +98,7 @@ def create_features_dict(image, points, P, face_mesh, s):
   return df
 
 def create_sleep_features_dict(points_dict):
+  df = {}
   df['l_eye_w'] = euc_distance(points_dict[362],points_dict[359])
   df['l_eye_h'] = euc_distance(points_dict[386],points_dict[374])
   df['r_eye_w'] = euc_distance(points_dict[130],points_dict[133])
@@ -112,8 +113,9 @@ def create_sleep_features_dict(points_dict):
   df['face_w_dist'] = abs(points_dict[10][0] - points_dict[175][0])
   return df
 
-def create_pose_features_dict(image, result, df):  
+def create_pose_features_dict(image, results, df):  
   width, height, color = image.shape
+  mp_pose = mp.solutions.pose
   df['r_shoulder_lip'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.MOUTH_RIGHT].y * height],\
       [results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y * height])
   df['r_shoulder_cheek'] = euc_distance([results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].x * width, results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR].y * height],\
