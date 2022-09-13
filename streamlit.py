@@ -55,7 +55,7 @@ cap = cv2.VideoCapture(0)
 FRAME_WINDOW = st.image([])
 # создаем счётчик, списки и словари и пустые датасеты
 points = [i for i in range (469)]
-# points_dict = {i : 0 for i in range(469)}
+points_dict = {i : 0 for i in range(469)}
 
 face_data = {
 'r_shoulder_lip': 0,'r_shoulder_cheek': 0,'r_shoulder_eye': 0,'r_shoulder_eye_h': 0,'r_shoulder_eye_w': 0,
@@ -111,12 +111,12 @@ if add_radio == "Stream":
             eyes_pred.append(EyeClassifier(points_dict))
             text4 = 'eyes_pred' + str(EyeClassifier(points_dict)) 
             text = 'face_cb_pred' + str(face_cb_pred) 
-        df_emo = create_features_dict(image, points, P, face_mesh, s=0)
-        emo_data_frame = pd.DataFrame(df_emo,index=[0])
-        emo_dump = pd.concat([emo_dump, emo_data_frame])
+            df_emo = create_features_dict(image, points, P, face_mesh, s=0)
+            emo_data_frame = pd.DataFrame(df_emo,index=[0])
+            emo_dump = pd.concat([emo_dump, emo_data_frame])
 
-        emo_pred = emo_cb_model.predict(emo_data_frame)
-        emo_pred = emo_pred[0]
+            emo_pred = emo_cb_model.predict(emo_data_frame)
+            emo_pred = emo_pred[0]
         
         else:
             face_cb_pred = 2
@@ -130,7 +130,7 @@ if add_radio == "Stream":
         results3 = pose.process(image)
         df = {}
         if results3.pose_landmarks:
-            df = create_pose_features_dict(image, result3, df)
+            df = create_pose_features_dict(image, results3, df)
             data_frame = pd.DataFrame(df,index=[0])
             face_dump = pd.concat([face_dump, data_frame])
             pose_cb_pred = pose_cb_model.predict(data_frame)
@@ -203,14 +203,14 @@ elif add_radio == "Statistics":
     choice = st.checkbox('Hour plot 📈')
     choice2 = st.checkbox('Day plot 📉')
     choice3 = st.checkbox('Table data 📊')
-    stat_frame = pd.read_csv('Frames_archive/test.csv')
+    stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
     stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
     stat_frame = stat_frame.iloc[1:]
     st.title('YOU DID NOT BELIEVE?')
     sound2.play()
     if choice:
         # # обработка датафрейма
-        stat_frame = pd.read_csv('Frames_archive/test.csv')
+        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
         stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
         stat_frame = stat_frame.iloc[1:]
         stat1 = stat_frame.copy()
@@ -426,7 +426,7 @@ elif add_radio == "Statistics":
         plt.tight_layout(h_pad=2)
         st.pyplot(fig)
     if choice2:
-        stat_frame = pd.read_csv('Frames_archive/test.csv')
+        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
         stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
         stat_frame = stat_frame.iloc[1:]
         stat1 = stat_frame.copy()
@@ -644,7 +644,7 @@ elif add_radio == "Statistics":
 
     if choice3:
          # # обработка датафрейма
-        stat_frame = pd.read_csv('Frames_archive/test.csv')
+        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
         stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
         stat_frame = stat_frame.iloc[1:]
         stat1 = stat_frame.copy()
