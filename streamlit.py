@@ -1,40 +1,39 @@
-# based
+# Based
 import pandas as pd
 import numpy as np
 import math as m
-# visualization
+# Visualization
 import seaborn as sns
 import matplotlib.pyplot as plt
-# web apps
+# Web apps
 import streamlit as st
-#stream
+# Stream
 import cv2
-# live ML
+# Live ML
 import mediapipe as mp
-#models
+# Models
 import pickle
-# time
+# Time
 from datetime import datetime, date, time
-# music
+# Music
 from pygame import mixer
 import pygame as pg
-# other functions
-from main_functions import euc_distance, EyeClassifier, StaticPose, create_sleep_features_dict, create_features_dict, create_pose_features_dict
-
-# загружаем звук будильника
+# Other functions
+from main_functions import euc_distance, EyeClassifier, StaticPose, create_sleep_features_dict, create_features_dict, create_pose_features_dict, stat_vis
+# Загружаем звук будильника
 mixer.init()
 mixer.music.load('songs/Song (mp3cut.net).mp3')
-#PyGame2
+# PyGame2
 pg.init()
 sound1 = pg.mixer.Sound('songs/IGOR.wav')
 sound2 = pg.mixer.Sound('songs/IGOR2.wav')
 sound3 = pg.mixer.Sound('songs/Song2.wav')
 
-# загружаем модели детекции сна и эмоций по позе и лицу
+# Загружаем модели детекции сна и эмоций по позе и лицу
 face_cb_model = pickle.load(open('ML_models/cl_face_cb.sav', 'rb'))
 pose_cb_model = pickle.load(open('ML_models/cl_pose_cb.sav', 'rb'))
 emo_cb_model = pickle.load(open('ML_models/cl_emo_cb.sav', 'rb'))
-# загружаем инструменты из библиотеки mediapipe
+# Загружаем инструменты из библиотеки mediapipe
 mp_face_mesh = mp.solutions.face_mesh # подключаем инструменты для рисования сетки
 mp_face_detection = mp.solutions.face_detection # подключаем инструменты для детекции
 mp_drawing = mp.solutions.drawing_utils # подключаем инструменты для рисования
@@ -42,19 +41,24 @@ mp_drawing_styles = mp.solutions.drawing_styles # подключаем стил�
 mp_pose = mp.solutions.pose # распознавание поз
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-#IGOR in streamlit, OMG!
-st.title('Select Format')
+# Главная страница
+col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+with col3:
+    st.header('I.')
+with col4:
+    st.header('G.')
+with col5:
+    st.header('O.')
+with col6:
+    st.header('R.')
 add_radio = st.selectbox(" ",("Stream", "Statistics"))
-FRAME_WINDOW = st.image([])
-if st.button('🖥'):
-    st.title("HI, MY NAME IS I.G.O.R AND I'LL BE WATCHING YOU 👁‍🗨")
-    sound1.play()
 
-# считываем видеопоток
+# Считываем видеопоток
 cap = cv2.VideoCapture(0)
 FRAME_WINDOW = st.image([])
-# создаем счётчик, списки и словари и пустые датасеты
+# Создаем счётчик, списки и словари и пустые датасеты
 points = [i for i in range (469)]
+
 points_dict = {i : 0 for i in range(469)}
 
 face_data = {
@@ -62,10 +66,14 @@ face_data = {
 'l_shoulder_lip': 0,'l_shoulder_cheek': 0,'l_shoulder_eye': 0,'l_shoulder_eye_h': 0,'l_shoulder_eye_w': 0
             }
 
-stat_dict_empt = {'Time': 0,'face_cb_pred': 0, 'EyeClassifier': 0, 'pose_cb_pred': 0, 'static_pose': 0,'sleep_predict': 0, 'cheater': 0, 'emotion': 0,'emo_sth': 0}
+stat_dict_empt = {
+    'Time': 0,'face_cb_pred': 0, 'EyeClassifier': 0, 'pose_cb_pred': 0, 'static_pose': 0,\
+    'sleep_predict': 0, 'cheater': 0, 'emotion': 0,'emo_sth': 0
+                 }
 
-teta_dump = {'teta1':0,'teta2':0,'teta3': 0,'teta4': 0,'teta5': 0,'teta6': 0,'teta7': 0,
-'teta8': 0,'teta9': 0,'teta10': 0}
+teta_dump = {
+    'teta1':0,'teta2':0,'teta3': 0,'teta4': 0,'teta5': 0,'teta6': 0,'teta7': 0,'teta8': 0,'teta9': 0,'teta10': 0
+            }
 
 P = {
     0:	61, 1: 292, 2: 0, 3: 17, 4:	50,	5: 280,	6: 48, 7: 4, 8:	289, 9:	206, 10: 426, 11: 133, 12: 130, 13: 159,\
@@ -75,20 +83,20 @@ P = {
 emo_dump = pd.DataFrame(teta_dump, index=[0])
 stat_frame_empt = pd.DataFrame(stat_dict_empt, index = [0])
 face_dump = pd.DataFrame(face_data, index=[0])
-
 face_pred,eyes_pred,pose_pred,emo_list = [],[],[],[]
-text4,text,text1,text2 = '','','',''
-
 fps_counter = 0
 
-# создаем объекты классов из библиотеки mediapipe
+# Создаем объекты классов из библиотеки mediapipe
 face_mesh = mp_face_mesh.FaceMesh(max_num_faces=50, refine_landmarks= True, min_detection_confidence=0.3, min_tracking_confidence=0.05)
 face_detection = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.3)
 pose = mp_pose.Pose(model_complexity=2, enable_segmentation=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-####### РАБОТА С ВИДЕОПОТОКОМ
+# Работа с видеопотоком
 if add_radio == "Stream":
-    run = st.checkbox('🎥')
+    if st.checkbox('Well met! Click here! 🖥'):
+        st.title("HI, MY NAME IS I.G.O.R AND I'LL BE WATCHING YOU 👁‍🗨")
+        sound1.play()
+    run = st.checkbox('Turn on your webcam 🎥')
     while run:
         _, image = cap.read()
         if _:
@@ -104,7 +112,7 @@ if add_radio == "Stream":
                     width, height, color = image.shape
                     width, height = int(point.x * height), int(point.y * width)
                     points_dict[id] = [width, height]
-            # находим расстояни между точками на лице
+            # Находим расстояни между точками на лице
             data_frame = pd.DataFrame(create_sleep_features_dict(points_dict),index=[0])
             face_cb_pred = face_cb_model.predict(data_frame)
             face_pred.append(face_cb_pred)
@@ -126,7 +134,7 @@ if add_radio == "Stream":
 
         emo_list.append(emo_pred[0])
         
-        # находим расстояния между точками на теле
+        # Находим расстояния между точками на теле
         results3 = pose.process(image)
         df = {}
         if results3.pose_landmarks:
@@ -141,7 +149,7 @@ if add_radio == "Stream":
             pose_pred.append(pose_cb_pred)
 
         if fps_counter % 20 == 0:
-            # собираем датасет для статистики
+            # Собираем датасет для статистики
             statistic_dict= {}
             time_now = str(datetime.today())[5:-7]
             try:
@@ -198,463 +206,45 @@ if add_radio == "Stream":
     cv2.destroyAllWindows()
     cap.release()
 
-
 elif add_radio == "Statistics":
-    choice = st.checkbox('Hour plot 📈')
-    choice2 = st.checkbox('Day plot 📉')
-    choice3 = st.checkbox('Table data 📊')
+    choice = st.button('Visualization for every 10 minuts 📈')
+    choice2 = st.button('Visualization for every hours 📉')
+    choice3 = st.button('Table data visualization  📊')
+
+    # Обрабатываем датафрейм для статистики
     stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
-    stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
+    stat_frame.drop(['Unnamed: 0','static_pose', 'emotion','face_cb_pred','EyeClassifier','pose_cb_pred'],axis=1,inplace=True)
+    stat_frame = stat_frame.rename(columns={'emo_sth':'emotion'})
     stat_frame = stat_frame.iloc[1:]
-    st.title('YOU DID NOT BELIEVE?')
-    sound2.play()
+    stat_frame = pd.get_dummies(data = stat_frame, columns = ['emotion'])
+    stat_frame['Hour'] = [val[6:8] for val in stat_frame['Time']]
+    stat_frame['decade'] = [val[9:10] for val in stat_frame['Time']]
+    stat_frame['Date'] = [val[0:5] for val in stat_frame['Time']]
+
+    # Параметры визуализации
+    sns.set(style="white", palette="muted", color_codes=True)
+
     if choice:
-        # # обработка датафрейма
-        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
-        stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
-        stat_frame = stat_frame.iloc[1:]
-        stat1 = stat_frame.copy()
-        stat1 = pd.get_dummies(data = stat1, columns = ['emotion'])
-        stat1['Hour'] = [val[6:8] for val in stat1['Time']]
-        stat1['decade'] = [val[9:10] for val in stat1['Time']]
-        stat1['Date'] = [val[0:5] for val in stat1['Time']]
-        stat1.drop('Time',axis=1,inplace=True)
-        df = stat1.groupby(by='decade').sum()
-        df.rename(index={i : i+str(0)+' to '+str(int(i)+1)+str(0) for i in list(df.index)},inplace=True)
-        df.rename(columns={'sleep_predict':'Sleep','cheater': 'Cheating detected','emotion_NO FACE': 'No face detected', 'emotion_disgust': 'Disgust','emotion_happy': 'Happy','emotion_neutral': 'Neutral','emotion_sad': 'Sad','emotion_surprise': 'Surprise'},inplace=True)
-        # Визуализация
+        st.title('YOU DID NOT BELIEVE?')
+        st.write('Total for every 10 minutes')
+        sound2.play()
+        # Визуализация за каждые 10 минут
+        df = stat_frame.groupby(by='decade').sum()
+        df.rename(index={i : i+str(0)+' to '+str(int(i)+1)+str(0) +' min' for i in list(df.index)},inplace=True)
+        stat_vis(df)
 
-        fig, (ax1, ax2, ax3,ax4,ax5,ax6,ax7,ax8) = plt.subplots(8, 1, figsize=(8, 10), sharex=True)
-        x = np.array(list(df.index))
-
-        try:
-            y1 = df['Neutral'].values
-            ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
-            for bar in ax1.patches:
-                ax1.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax1.axhline(0, color="k", clip_on=False)
-            ax1.set_ylabel("neutral")
-        except:
-            df['Neutral'] = 0
-            y1 = df['Neutral'].values
-            ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
-            for bar in ax1.patches:
-                ax1.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax1.axhline(0, color="k", clip_on=False)
-            ax1.set_ylabel("neutral")
-
-        try:
-            y2 = df['Happy'].values
-            ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
-            for bar in ax2.patches:
-                ax2.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax2.axhline(0, color="k", clip_on=False)
-            ax2.set_ylabel("happy")
-        except:
-            df['Happy'] = 0
-            y2 = df['Happy'].values
-            ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
-            for bar in ax2.patches:
-                ax2.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax2.axhline(0, color="k", clip_on=False)
-            ax2.set_ylabel("happy")
-
-        try:
-            y3 = df['Sad'].values
-            ax3 = sns.barplot(x=x, y=y3, palette="ch:s=.25,rot=-.25", ax=ax3)
-            for bar in ax3.patches:
-                ax3.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax3.axhline(0, color="k", clip_on=False)
-            ax3.set_ylabel("sad")
-        except:
-            df['Sad'] = 0
-            y3 = df['Sad'].values
-            ax3 = sns.barplot(x=x, y=y3, palette="ch:s=.25,rot=-.25", ax=ax3)
-            for bar in ax3.patches:
-                ax3.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax3.axhline(0, color="k", clip_on=False)
-            ax3.set_ylabel("sad")
-
-        try:
-            y4 = df['Surprise'].values
-            ax4 = sns.barplot(x=x, y=y4, palette="light:#5A9", ax=ax4)
-            for bar in ax4.patches:
-                ax4.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax4.axhline(0, color="k", clip_on=False)
-            ax4.set_ylabel("surprise")
-        except:
-            df['Surprise'] = 0
-            y4 = df['Surprise'].values
-            ax4 = sns.barplot(x=x, y=y4, palette="light:#5A9", ax=ax4)
-            for bar in ax4.patches:
-                ax4.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax4.axhline(0, color="k", clip_on=False)
-            ax4.set_ylabel("surprise")
-
-        try:
-            y5 = df['Disgust'].values
-            ax5 = sns.barplot(x=x, y=y5, palette="ch:s=.25,rot=-.25", ax=ax5)
-            for bar in ax5.patches:
-                ax5.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax5.axhline(0, color="k", clip_on=False)
-            ax5.set_ylabel("disgust")
-        except:
-            df['Disgust'] = 0
-            y5 = df['Disgust'].values
-            ax5 = sns.barplot(x=x, y=y5, palette="ch:s=.25,rot=-.25", ax=ax5)
-            for bar in ax5.patches:
-                ax5.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax5.axhline(0, color="k", clip_on=False)
-            ax5.set_ylabel("disgust")
-
-        try:
-            y6 = df['No face detected'].values
-            ax6 = sns.barplot(x=x, y=y6, palette="light:#5A9", ax=ax6)
-            for bar in ax6.patches:
-                ax6.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax6.axhline(0, color="k", clip_on=False)
-            ax6.set_ylabel("No face detected")
-        except:
-            df['No face detected'] = 0
-            y6 = df['No face detected'].values
-            ax6 = sns.barplot(x=x, y=y6, palette="light:#5A9", ax=ax6)
-            for bar in ax6.patches:
-                ax6.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax6.axhline(0, color="k", clip_on=False)
-            ax6.set_ylabel("No face detected")
-        try:
-            y7 = df['Sleep'].values
-            ax7 = sns.barplot(x=x, y=y7, palette="ch:s=.25,rot=-.25", ax=ax7)
-            for bar in ax7.patches:
-                ax7.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax7.axhline(0, color="k", clip_on=False)
-            ax7.set_ylabel("Sleep")
-        except:
-            df['Sleep'] = 0
-            y7 = df['Sleep'].values
-            ax7 = sns.barplot(x=x, y=y7, palette="ch:s=.25,rot=-.25", ax=ax7)
-            for bar in ax7.patches:
-                ax7.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax7.axhline(0, color="k", clip_on=False)
-            ax7.set_ylabel("Sleep")
-
-        try:
-            y8 = df['Cheating detected'].values
-            ax8 = sns.barplot(x=x, y=y8, palette="light:#5A9", ax=ax8)
-            for bar in ax8.patches:
-                ax8.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax8.axhline(0, color="k", clip_on=False)
-            ax8.set_ylabel("Cheating detected")
-            ax8.set_xlabel('Total for every 10 minutes')
-        except:
-            df['Cheating detected'] = 0
-            y8 = df['Cheating detected'].values
-            ax8 = sns.barplot(x=x, y=y8, palette="light:#5A9", ax=ax8)
-            for bar in ax8.patches:
-                ax8.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax8.axhline(0, color="k", clip_on=False)
-            ax8.set_ylabel("Cheating detected")
-            ax8.set_xlabel('Total for every 10 minutes')
-
-        # Finalize the plot
-        sns.despine(bottom=True)
-        plt.setp(fig.axes, yticks=[])
-        plt.tight_layout(h_pad=2)
-        st.pyplot(fig)
     if choice2:
-        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
-        stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
-        stat_frame = stat_frame.iloc[1:]
-        stat1 = stat_frame.copy()
-        stat1 = pd.get_dummies(data = stat1, columns = ['emotion'])
-        stat1['Hour'] = [val[6:8] for val in stat1['Time']]
-        stat1['decade'] = [val[9:10] for val in stat1['Time']]
-        stat1['Date'] = [val[0:5] for val in stat1['Time']]
-        stat1.drop('Time',axis=1,inplace=True)
-        df = stat1.groupby(by='Hour').sum()
+        st.title('YOU DID NOT BELIEVE?')
+        st.write('Total for every hour')
+        sound2.play()
+        # Визуализация за каждый час
+        df = stat_frame.groupby(by='Hour').sum()
         df.rename(index={i : i + ' hour' for i in list(df.index)},inplace=True)
-        df.rename(columns={'sleep_predict':'Sleep','cheater': 'Cheating detected','emotion_NO FACE': 'No face detected', 'emotion_disgust': 'Disgust','emotion_happy': 'Happy','emotion_neutral': 'Neutral','emotion_sad': 'Sad','emotion_surprise': 'Surprise'},inplace=True)
-        # Визуализация
-
-        fig, (ax1, ax2, ax3,ax4,ax5,ax6,ax7,ax8) = plt.subplots(8, 1, figsize=(8 , 12), sharex=True)
-
-        x = np.array(list(df.index))
-        try:
-            y1 = df['Neutral'].values
-            ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
-            for bar in ax1.patches:
-                ax1.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax1.axhline(0, color="k", clip_on=False)
-            ax1.set_ylabel("neutral")
-        except:
-            df['Neutral'] = 0
-            y1 = df['Neutral'].values
-            ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
-            for bar in ax1.patches:
-                ax1.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax1.axhline(0, color="k", clip_on=False)
-            ax1.set_ylabel("neutral")
-
-        try:
-            y2 = df['Happy'].values
-            ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
-            for bar in ax2.patches:
-                ax2.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax2.axhline(0, color="k", clip_on=False)
-            ax2.set_ylabel("happy")
-        except:
-            df['Happy'] = 0
-            y2 = df['Happy'].values
-            ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
-            for bar in ax2.patches:
-                ax2.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax2.axhline(0, color="k", clip_on=False)
-            ax2.set_ylabel("happy")
-
-        try:
-            y3 = df['Sad'].values
-            ax3 = sns.barplot(x=x, y=y3, palette="ch:s=.25,rot=-.25", ax=ax3)
-            for bar in ax3.patches:
-                ax3.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax3.axhline(0, color="k", clip_on=False)
-            ax3.set_ylabel("sad")
-        except:
-            df['Sad'] = 0
-            y3 = df['Sad'].values
-            ax3 = sns.barplot(x=x, y=y3, palette="ch:s=.25,rot=-.25", ax=ax3)
-            for bar in ax3.patches:
-                ax3.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax3.axhline(0, color="k", clip_on=False)
-            ax3.set_ylabel("sad")
-
-        try:
-            y4 = df['Surprise'].values
-            ax4 = sns.barplot(x=x, y=y4, palette="light:#5A9", ax=ax4)
-            for bar in ax4.patches:
-                ax4.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax4.axhline(0, color="k", clip_on=False)
-            ax4.set_ylabel("surprise")
-        except:
-            df['Surprise'] = 0
-            y4 = df['Surprise'].values
-            ax4 = sns.barplot(x=x, y=y4, palette="light:#5A9", ax=ax4)
-            for bar in ax4.patches:
-                ax4.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax4.axhline(0, color="k", clip_on=False)
-            ax4.set_ylabel("surprise")
-
-        try:
-            y5 = df['Disgust'].values
-            ax5 = sns.barplot(x=x, y=y5, palette="ch:s=.25,rot=-.25", ax=ax5)
-            for bar in ax5.patches:
-                ax5.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax5.axhline(0, color="k", clip_on=False)
-            ax5.set_ylabel("disgust")
-        except:
-            df['Disgust'] = 0
-            y5 = df['Disgust'].values
-            ax5 = sns.barplot(x=x, y=y5, palette="ch:s=.25,rot=-.25", ax=ax5)
-            for bar in ax5.patches:
-                ax5.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax5.axhline(0, color="k", clip_on=False)
-            ax5.set_ylabel("disgust")
-
-        try:
-            y6 = df['No face detected'].values
-            ax6 = sns.barplot(x=x, y=y6, palette="light:#5A9", ax=ax6)
-            for bar in ax6.patches:
-                ax6.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax6.axhline(0, color="k", clip_on=False)
-            ax6.set_ylabel("No face detected")
-        except:
-            df['No face detected'] = 0
-            y6 = df['No face detected'].values
-            ax6 = sns.barplot(x=x, y=y6, palette="light:#5A9", ax=ax6)
-            for bar in ax6.patches:
-                ax6.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax6.axhline(0, color="k", clip_on=False)
-            ax6.set_ylabel("No face detected")
-        try:
-            y7 = df['Sleep'].values
-            ax7 = sns.barplot(x=x, y=y7, palette="ch:s=.25,rot=-.25", ax=ax7)
-            for bar in ax7.patches:
-                ax7.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax7.axhline(0, color="k", clip_on=False)
-            ax7.set_ylabel("Sleep")
-        except:
-            df['Sleep'] = 0
-            y7 = df['Sleep'].values
-            ax7 = sns.barplot(x=x, y=y7, palette="ch:s=.25,rot=-.25", ax=ax7)
-            for bar in ax7.patches:
-                ax7.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax7.axhline(0, color="k", clip_on=False)
-            ax7.set_ylabel("Sleep")
-
-        try:
-            y8 = df['Cheating detected'].values
-            ax8 = sns.barplot(x=x, y=y8, palette="light:#5A9", ax=ax8)
-            for bar in ax8.patches:
-                ax8.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax8.axhline(0, color="k", clip_on=False)
-            ax8.set_ylabel("Cheating detected")
-            ax8.set_xlabel('Total for every hour')
-        except:
-            df['Cheating detected'] = 0
-            y8 = df['Cheating detected'].values
-            ax8 = sns.barplot(x=x, y=y8, palette="light:#5A9", ax=ax8)
-            for bar in ax8.patches:
-                ax8.annotate(format(bar.get_height(), '.2f'),
-                (bar.get_x() + bar.get_width() / 2,
-                bar.get_height()), ha='center', va='center',
-                size=10, xytext=(0, 5),
-                textcoords='offset points')
-            ax8.axhline(0, color="k", clip_on=False)
-            ax8.set_ylabel("Cheating detected")
-            ax8.set_xlabel('Total for every hour')
-
-        # Finalize the plot
-        sns.despine(bottom=True)
-        plt.setp(fig.axes, yticks=[])
-        plt.tight_layout(h_pad=2)
-        st.pyplot(fig)
+        stat_vis(df)
 
     if choice3:
-         # # обработка датафрейма
-        stat_frame = pd.read_csv('Frames_archive/stat_frame.csv')
-        stat_frame.drop(['Unnamed: 0','static_pose'],axis=1,inplace=True)
-        stat_frame = stat_frame.iloc[1:]
-        stat1 = stat_frame.copy()
-        stat1 = pd.get_dummies(data = stat1, columns = ['emotion'])
-        stat1['Hour'] = [val[6:8] for val in stat1['Time']]
-        stat1['decade'] = [val[9:10] for val in stat1['Time']]
-        stat1['Date'] = [val[0:5] for val in stat1['Time']]
-        stat1.drop('Time',axis=1,inplace=True)
-        df = stat1.groupby(by='decade').sum()
-        df.rename(index={i : i+str(0)+' to '+str(int(i)+1)+str(0) for i in list(df.index)},inplace=True)
-        df.rename(columns={'sleep_predict':'Sleep','cheater': 'Cheating detected','emotion_NO FACE': 'No face detected', 'emotion_disgust': 'Disgust','emotion_happy': 'Happy','emotion_neutral': 'Neutral','emotion_sad': 'Sad','emotion_surprise': 'Surprise'},inplace=True)
-        # Визуализация
-        st.dataframe(df)
+        st.title('YOU DID NOT BELIEVE?')
+        sound2.play()
+        # Визуализация датафрейма
+        stat_frame.drop(['Hour','decade','Date'],axis=1,inplace=True)
+        st.dataframe(stat_frame)

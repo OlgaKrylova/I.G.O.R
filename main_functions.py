@@ -1,6 +1,10 @@
 import math as m
 import cv2
 import mediapipe as mp
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
+import numpy as np
 
 def euc_distance(x,y):
   a = ((x[0]-y[0])**2+(x[1]-y[1])**2)**0.5
@@ -133,3 +137,203 @@ def create_pose_features_dict(image, results, df):
   df['l_shoulder_eye_h'] = - results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].y * height + results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y * height
   df['l_shoulder_eye_w'] = - results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE].x * width + results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x * width  
   return df
+
+def stat_vis(df):
+    fig, (ax1, ax2, ax3,ax4,ax5,ax6,ax7,ax8) = plt.subplots(8, 1, figsize=(10, 8), sharex=True)
+    x = np.array(list(df.index))
+    try:
+        y1 = df['emotion_neutral'].values
+        ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
+        for bar in ax1.patches:
+            ax1.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax1.axhline(0, color="k", clip_on=False)
+        ax1.set_ylabel("neutral")
+    except:
+        df['emotion_neutral'] = 0
+        y1 = df['emotion_neutral'].values
+        ax1 = sns.barplot(x=x, y=y1, palette="ch:s=.25,rot=-.25", ax=ax1)
+        for bar in ax1.patches:
+            ax1.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax1.axhline(0, color="k", clip_on=False)
+        ax1.set_ylabel("neutral")
+
+    try:
+        y2 = df['emotion_happy'].values
+        ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
+        for bar in ax2.patches:
+            ax2.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax2.axhline(0, color="k", clip_on=False)
+        ax2.set_ylabel("happy")
+    except:
+        df['emotion_happy'] = 0
+        y2 = df['emotion_happy'].values
+        ax2 = sns.barplot(x=x, y=y2, palette="light:#5A9", ax=ax2)
+        for bar in ax2.patches:
+            ax2.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax2.axhline(0, color="k", clip_on=False)
+        ax2.set_ylabel("happy")
+
+    try:
+        y3 = df['emotion_sad'].values
+        ax3 = sns.barplot(x=x, y=y3, palette="rocket", ax=ax3)
+        for bar in ax3.patches:
+            ax3.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax3.axhline(0, color="k", clip_on=False)
+        ax3.set_ylabel("sad")
+    except:
+        df['emotion_sad'] = 0
+        y3 = df['emotion_sad'].values
+        ax3 = sns.barplot(x=x, y=y3, palette="rocket", ax=ax3)
+        for bar in ax3.patches:
+            ax3.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax3.axhline(0, color="k", clip_on=False)
+        ax3.set_ylabel("sad")
+
+    try:
+        y4 = df['emotion_surprise'].values
+        ax4 = sns.barplot(x=x, y=y4, palette="rocket", ax=ax4)
+        for bar in ax4.patches:
+            ax4.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax4.axhline(0, color="k", clip_on=False)
+        ax4.set_ylabel("surprise")
+    except:
+        df['emotion_surprise'] = 0
+        y4 = df['emotion_surprise'].values
+        ax4 = sns.barplot(x=x, y=y4, palette="rocket", ax=ax4)
+        for bar in ax4.patches:
+            ax4.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax4.axhline(0, color="k", clip_on=False)
+        ax4.set_ylabel("surprise")
+
+    try:
+        y5 = df['emotion_disgust'].values
+        ax5 = sns.barplot(x=x, y=y5, palette="rocket", ax=ax5)
+        for bar in ax5.patches:
+            ax5.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax5.axhline(0, color="k", clip_on=False)
+        ax5.set_ylabel("disgust")
+    except:
+        df['emotion_disgust'] = 0
+        y5 = df['emotion_disgust'].values
+        ax5 = sns.barplot(x=x, y=y5, palette="rocket", ax=ax5)
+        for bar in ax5.patches:
+            ax5.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax5.axhline(0, color="k", clip_on=False)
+        ax5.set_ylabel("disgust")
+
+    try:
+        y6 = df['emotion_NO FACE'].values
+        ax6 = sns.barplot(x=x, y=y6, palette="rocket", ax=ax6)
+        for bar in ax6.patches:
+            ax6.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax6.axhline(0, color="k", clip_on=False)
+        ax6.set_ylabel("NO FACE")
+    except:
+        df['emotion_NO FACE'] = 0
+        y6 = df['emotion_NO FACE'].values
+        ax6 = sns.barplot(x=x, y=y6, palette="rocket", ax=ax6)
+        for bar in ax6.patches:
+            ax6.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax6.axhline(0, color="k", clip_on=False)
+        ax6.set_ylabel("NO FACE")
+    try:
+        y7 = df['sleep_predict'].values
+        ax7 = sns.barplot(x=x, y=y7, palette="rocket", ax=ax7)
+        for bar in ax7.patches:
+            ax7.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax7.axhline(0, color="k", clip_on=False)
+        ax7.set_ylabel("Sleep")
+    except:
+        df['sleep_predict'] = 0
+        y7 = df['sleep_predict'].values
+        ax7 = sns.barplot(x=x, y=y7, palette="rocket", ax=ax7)
+        for bar in ax7.patches:
+            ax7.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax7.axhline(0, color="k", clip_on=False)
+        ax7.set_ylabel("Sleep")
+
+    try:
+        y8 = df['cheater'].values
+        ax8 = sns.barplot(x=x, y=y8, palette="rocket", ax=ax8)
+        for bar in ax8.patches:
+            ax8.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax8.axhline(0, color="k", clip_on=False)
+        ax8.set_ylabel("cheater")
+    except:
+        df['cheater'] = 0
+        y8 = df['cheater'].values
+        ax8 = sns.barplot(x=x, y=y8, palette="rocket", ax=ax8)
+        for bar in ax8.patches:
+            ax8.annotate(format(bar.get_height(), '.2f'),
+            (bar.get_x() + bar.get_width() / 2,
+            bar.get_height()), ha='center', va='center',
+            size=10, xytext=(0, 5),
+            textcoords='offset points')
+        ax8.axhline(0, color="k", clip_on=False)
+        ax8.set_ylabel("cheater")
+
+    # Finalize the plot
+    sns.despine(bottom=True)
+    plt.setp(fig.axes, yticks=[])
+    plt.tight_layout(h_pad=2)
+    st.pyplot(fig)
