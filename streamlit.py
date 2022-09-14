@@ -1,10 +1,7 @@
 # Based
 import pandas as pd
-import numpy as np
-import math as m
 # Visualization
 import seaborn as sns
-import matplotlib.pyplot as plt
 # Web apps
 import streamlit as st
 # Stream
@@ -14,12 +11,12 @@ import mediapipe as mp
 # Models
 import pickle
 # Time
-from datetime import datetime, date, time
+from datetime import datetime
 # Music
 from pygame import mixer
 import pygame as pg
 # Other functions
-from main_functions import euc_distance, EyeClassifier, StaticPose, create_sleep_features_dict, create_features_dict, create_pose_features_dict, stat_vis
+from main_functions import EyeClassifier, StaticPose, create_sleep_features_dict, create_features_dict, create_pose_features_dict, stat_vis
 # Загружаем звук будильника
 mixer.init()
 mixer.music.load('songs/Song (mp3cut.net).mp3')
