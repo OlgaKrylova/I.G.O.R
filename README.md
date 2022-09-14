@@ -4,7 +4,7 @@ Imperfect but Glorious Oppressive Robot
 ![misha_sleeps](images/misha_sleeps.gif)
 
 Система удаленного констроля и анализа поведения сотрудника на рабочем месте. Включает детекцию сна, детекцию эмоций, инструменты обратной связи, сбора статистики и визуализации.
-Это проект [@ShakalTabaqui](https://github.com/ShakalTabaqui), [@VAapero1](https://github.com/VAapero1), [@OlgaKrylova](https://github.com/OlgaKrylova), [@datascientist73](https://github.com/datascientist73) в [Elbrus coding bootcamp](https://github.com/Elbrus-DataScience).
+Это проект [@ShakalTabaqui](https://github.com/ShakalTabaqui), [@VAapero1](https://github.com/VAapero1), [@OlgaKrylova](https://github.com/OlgaKrylova), [@datascientist73](https://github.com/datascientist73) в [Elbrus coding bootcamp](https://github.com/Elbrus-DataScience). Видеодемонстрация лежит [тут](images/mmm.mp4).
 
 <p align="justify">Мы использовали библиотеку <a href="https://google.github.io/mediapipe/">MediaPipe</a> для детекции лица, позы человека и получения координат точек на лице и теле. На основе информациии о точках мы считали расстояния и углы на лице и теле для обучения классификаторов.
 Классификаторов всего три:спящего лица, спящей позы и эмоций. Все они работают на <a href="https://catboost.ai/en/docs/">CatBoost</a>.
