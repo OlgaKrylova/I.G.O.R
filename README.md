@@ -41,6 +41,12 @@ Imperfect but Glorious Oppressive Robot
     streamlit run streamlit.py
 
   *Эта команда запустит приложение*
+  
+<h2>Описание дополнительных файлов</h2>
+
+- emotions_classifier.ipynb - обучение классификатора эмоций
+
+- camera_emotions.py - запускается также через терминал; в реальном времени строит на лице сетку и классифицирует эмоции (как на изображениях выше)
     
 <h1>TODO</h1>
 
